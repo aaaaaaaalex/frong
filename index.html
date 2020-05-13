@@ -30,8 +30,8 @@
     display: block;
     position: absolute;
     top: 40%;
-    left: 45%;
-    margin: auto;
+    left: 50%;
+    margin-left: calc(-152px/2);
     width: 152px;
     height: 111px;
     background-size: contain;
@@ -68,10 +68,10 @@
 
 
 <body>
-  <audio id='hit1'><source src='hit1.wav'></audio>
-  <audio id='hit2'><source src='hit2.wav'></audio>
-  <audio id='hit3'><source src='hit3.wav'></audio>
-  <audio id='appear'><source src='appear.mp3'></audio>
+  <audio id='hit1' autostart="false"><source src='hit1.wav'></audio>
+  <audio id='hit2' autostart="false"><source src='hit2.wav'></audio>
+  <audio id='hit3' autostart="false"><source src='hit3.wav'></audio>
+  <audio id='appear' autostart="false"><source src='appear.mp3'></audio>
 
   <h1 id='score' class='hiddenBeforeLoad unselectable wiggle'>PET THE FRONG <br> YOUR SCORE: <span id='score-num'>0</span></h1>
   <a class='button--play hiddenBeforeLoad' id='frong'></a>  

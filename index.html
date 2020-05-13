@@ -1,0 +1,121 @@
+<head>
+  <style>
+  html * {
+    animation: none;
+    cursor: url('hande.png'), auto;
+  }
+
+  body {
+    background-image:  url('grass.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  #score {
+    position:absolute;
+    text-align: center;
+    top:30%;
+    left: 41%;
+    color: white;
+    font-weight: 800;
+  }
+
+  .unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  #frong {
+    display: block;
+    position: absolute;
+    top: 40%;
+    left: 45%;
+    margin: auto;
+    width: 152px;
+    height: 111px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url(frong.jpg);
+    background-color: white;
+    box-shadow: none;
+  }
+
+  .hiddenBeforeLoad { display: none !important; }
+
+  @keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(5deg); }
+    80% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .wiggle {
+    animation-name: wiggle;
+    animation-duration: .1s;
+    animation-delay: 0;
+    animation-iteration-count: infinite;
+  }
+
+  .wiggle-once {
+    animation-name: wiggle;
+    animation-duration: .1s;
+    animation-delay: 0;
+    animation-iteration-count: 1;
+  }
+  </style>
+</head>
+
+
+<body>
+  <audio id='hit1'><source src='hit1.wav'></audio>
+  <audio id='hit2'><source src='hit2.wav'></audio>
+  <audio id='hit3'><source src='hit3.wav'></audio>
+  <audio id='appear'><source src='appear.mp3'></audio>
+
+  <h1 id='score' class='hiddenBeforeLoad unselectable wiggle'>PET THE FRONG <br> YOUR SCORE: <span id='score-num'>0</span></h1>
+  <a class='button--play hiddenBeforeLoad' id='frong'></a>  
+</body>
+
+
+<footer>
+  <script type='text/javascript'>
+  function main() {
+    setTimeout(start, 5000);
+  }
+
+  function start() {
+    var hiddenBeforeLoad = document.querySelectorAll('.hiddenBeforeLoad');
+    hiddenBeforeLoad.forEach( function(e){
+      e.classList.remove('hiddenBeforeLoad');
+    });
+
+    var frong = document.getElementById('frong');
+    var songe = document.getElementById('songe');
+    var hits  = document.querySelectorAll('audio[id^="hit"]');
+    var appear = document.getElementById('appear');
+    var scorenum = document.getElementById('score-num');
+
+    var userScore = 0;
+
+    appear.play();
+
+    frong.addEventListener( 'click', function(e){
+      var randNum = Math.floor( Math.random() * 3 );
+      hits[randNum].play();
+
+      frong.classList.add('wiggle-once');
+      setTimeout(function(){ frong.classList.remove('wiggle-once')}, 300);
+
+      userScore += (Math.floor( Math.random() * 80 ) + 20);
+      scorenum.innerHTML = userScore;
+    });
+
+  }  
+
+  main();
+  </script>
+</footer>

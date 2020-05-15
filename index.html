@@ -91,7 +91,6 @@
   </style>
 
   <script type='text/javascript'>
-
 /*         __          .__                    __  .__.__  .__  __                               .__        __          
   _______/  |_ ___.__.|  |   ____     __ ___/  |_|__|  | |__|/  |_ ___.__.    ______ ___________|__|______/  |_  ______
  /  ___/\   __<   |  ||  | _/ __ \   |  |  \   __\  |  | |  \   __<   |  |   /  ___// ___\_  __ \  \____ \   __\/  ___/
@@ -105,6 +104,42 @@
       elem.classList.remove('wiggle-once');
     }, 300);
   }
+  </script>
+
+
+  <script type='text/javascript'>
+  GameStorage = {
+
+    fallbackToCookieStorage: false,
+
+    init: function() {
+      try {
+        localStorage.setItem('test', 1);
+      } catch(err) {
+        console.error('frong memory kinda bade doe :///// COOKIE TIEM');
+        this.fallbackToCookieStorage = true;
+      }
+    },
+
+    set: function(key, val) {
+      if (!this.fallbackToCookieStorage) return localStorage.setItem(key, val);
+      else return this._cookieSet(key, val);
+    },
+
+    get: function(key) {
+      if (!this.fallbackToCookieStorage) return localStorage.getItem(key);
+      else return this._cookieGet(key);
+    },
+
+    _cookieSet: function(key, val) {
+      document.cookie = key+'='+val+';expires=Fri, 15 May 9999 23:59:59 GMT';
+    },
+    _cookieGet: function(key){
+      var captureCookieValue = new RegExp('(?:(?:^|.*;\\s*)'+key+'\\s*\\=\\s*([^;]*).*$)|^.*$');
+      return document.cookie.replace(captureCookieValue, "$1");
+    },
+
+  };
   </script>
 
 </head>
@@ -127,6 +162,7 @@
 <footer>
   <script type='text/javascript'>
   function main() {
+    GameStorage.init();
     var startbtn = document.getElementById('start');
     startbtn.addEventListener('click', function(e){
         startbtn.classList.add('hidden');
@@ -147,7 +183,7 @@
     var highscoreContainerElem = document.getElementById('highscore');
     var highscoreElem = document.getElementById('highscore-num');
     var score = 0;
-    var highscore = parseInt(document.cookie.replace(/(?:(?:^|.*;\s*)highscore\s*\=\s*([^;]*).*$)|^.*$/, "$1")) || 0;
+    var highscore = GameStorage.get('highscore') || 0;
     highscoreElem.innerHTML = highscore;
     function increaseScore() {
       score += (Math.floor( Math.random() * 80 ) + 20);
@@ -159,8 +195,7 @@
 
       scoreElem.innerHTML = score;
       highscoreElem.innerHTML = highscore;
-
-      document.cookie = 'highscore='+highscore+';expires=Fri, 15 May 2020 23:59:59 GMT';
+      GameStorage.set('highscore', highscore);
     }
 
 

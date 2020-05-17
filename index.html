@@ -328,10 +328,10 @@
     GameStorage.init();
     var urNameElem = document.getElementById('urName');
     urNameElem.focus();
-    var urName = urNameElem.value;
     var startbtn = document.getElementById('start');
     startbtn.addEventListener('click', function(e){
-        Leaderboard.hello(urName, function(onlineEnabled){start(onlineEnabled)});
+      var urName = urNameElem.value;
+      Leaderboard.hello(urName, function(onlineEnabled){start(onlineEnabled)});
     });
   }
 
@@ -382,7 +382,6 @@
     var highscore = GameStorage.get('highscore') || 0;
     highscoreElem.innerHTML = highscore;
 
-    const LeaderboardScoreThrottled = Throttle(Leaderboard.score, 1000).bind( Leaderboard._getContext() );
     function increaseScore() {
       var points = (Math.floor( Math.random() * 80 ) + 20);
       score += points;
@@ -395,7 +394,7 @@
       scoreElem.innerHTML = score;
       highscoreElem.innerHTML = highscore;
       GameStorage.set('highscore', highscore);
-      if (online) LeaderboardScoreThrottled(points);
+      if (online) Leaderboard.score(points);
     }
 
     /* if i pet a fronge in the woods and no one is 

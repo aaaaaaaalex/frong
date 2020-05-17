@@ -14,7 +14,7 @@
       background-size: cover;
       overflow: hidden;
     }
-    h1, label {
+    h1, label, li {
       font-weight: 800;
       color: white;
     }
@@ -23,7 +23,7 @@
     #score {
       text-align: center;
     }
-    #highscore {
+    #scores-container {
       text-align: center;
       position: absolute; bottom: 10px; width: 100vw;
     }
@@ -46,7 +46,10 @@
       background-color: white;
       box-shadow: none;
     }
-
+    #leaderboard{
+      text-align: center;
+      list-style: decimal;
+    }
 
     .hidden{display:none !important;}
     .unselectable {
@@ -119,6 +122,23 @@
       }
     }
 
+    function Hide(selector) {
+      selected = document.querySelectorAll(selector);
+      if (selected) {
+        selected.forEach( function(el) {
+          el.classList.add('hidden');
+        });
+      }
+    }
+
+    function Show(selector) {
+      selected = document.querySelectorAll(selector);
+      if (selected) {
+        selected.forEach( function(el) {
+          el.classList.remove('hidden');
+        });
+      }
+    }
   </script>
 
 
@@ -253,7 +273,7 @@
             else if (onerror) onerror(xhr);
           }
         }
-        xhr.send(body);
+        xhr.send(JSON.stringify(body));
         return 
       },
 
@@ -273,7 +293,28 @@
   <h1 id='score' class='toggleVisibilityOnLoad hidden unselectable'>PET THE FRONG <br> YOUR SCORE: <span id='score-num'>0</span></h1>
   <a  id='frong' class='toggleVisibilityOnLoad hidden anim-speed-10'></a>
   
-  <h1 id='highscore' class='toggleVisibilityOnLoad hidden'>UR BESTEST: <span id='highscore-num'>0</span></h1>
+  <div id=scores-container class='toggleVisibilityOnLoad hidden'>
+    <h1 id='highscore'>UR BESTEST: <span id='highscore-num'>0</span></h1>
+    <hr>
+    <ul id='leaderboard' class='hidden'>
+      <li>Kermit: 0</li>
+      <li>Kermit: 0</li>
+      <li>Kermit: 0</li>
+      <li>Kermit: 0</li>
+      <li>Kermit: 0</li>
+      <li>Kermit: 0</li>
+      <li>Kermit: 0</li>
+    </ul>
+    <h1 id='leaderboard-offline'>Where's everyone gone :c</h1>
+  </div>
+
+  <!---           _____                                 __                 __   
+  \_ |__   _____/ ____\___________   ____      _______/  |______ ________/  |_ 
+   | __ \_/ __ \   __\/  _ \_  __ \_/ __ \    /  ___/\   __\__  \\_  __ \   __\
+   | \_\ \  ___/|  | (  <_> )  | \/\  ___/    \___ \  |  |  / __ \|  | \/|  |  
+   |___  /\___  >__|  \____/|__|    \___  >  /____  > |__| (____  /__|   |__|  
+       \/     \/                        \/        \/            \/              -->
+  
   <label for='urName' class='toggleVisibilityOnLoad'>gibe ur name pls...</label>
   <input type='text' id='urName' class='toggleVisibilityOnLoad' placeholder='kremit'>
   <h1 id='start' class='toggleVisibilityOnLoad wiggle'>START</h1> 
@@ -302,6 +343,33 @@
 
     // leaderboard
     var leaderboardUL = document.getElementById('leaderboard');
+    var leaderboardObj = { 'name':"cremit", 'score':0, 'isMe':false };
+    
+    // keep 'er synced
+    if (!online) {
+      setInterval(function(){
+        Leaderboard.refresh(function(leaderboard){
+          if (leaderboard) {
+            Show('#leaderboard');
+            Hide('#leaderboard-offline');
+            var i = 0;
+            var listItems = leaderboard.querySelectorAll('#leaderboard li');
+            for(i=0; i<leaderboard.listItems.length; i++){
+              listItems[i].innerHTML = (leaderboard[i])['name']+": "+(leaderboard[i])['score'];
+              if ((leaderboard[i])['isMe']){
+                listItems[i].classList.add('me');
+              } else listItems[i].clasList.remove('me');
+            }
+          }
+          else {
+            // swap leaderboard to offline version, *dont* go offline though
+            Hide('#leaderboard-offline');
+            Show('#leaderboard'); 
+          }
+        });
+      }, 1000);
+    }
+
     // petting points
     var scoreContainerElem = document.getElementById('score');
     var scoreElem = document.getElementById('score-num');

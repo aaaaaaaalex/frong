@@ -224,12 +224,15 @@
         // name doesnt actually matter after init, its just an alias for the uuid the API will gen for you
         this._leaderboardReq( 'POST', {'name': urName},
           function(xhr){
-            var response = JSON.parse(xhr.responseText);
-            this.uuid = response.uuid;
-            initComplete(true);
+            try {
+              var response = JSON.parse(xhr.responseText);
+              this.uuid = response.uuid;
+              initComplete(true);
+            } catch (e) {
+              initComplete(false);
+            }
           },
           function(xhr){
-            OnlineEnabled = false;
             console.error("Leaderboard ain't too social today :(");
             initComplete(false);
           }
@@ -346,7 +349,7 @@
     var leaderboardObj = { 'name':"cremit", 'score':0, 'isMe':false };
     
     // keep 'er synced
-    if (!online) {
+    if (online) {
       setInterval(function(){
         Leaderboard.refresh(function(leaderboard){
           if (leaderboard) {
@@ -363,8 +366,8 @@
           }
           else {
             // swap leaderboard to offline version, *dont* go offline though
-            Hide('#leaderboard-offline');
-            Show('#leaderboard'); 
+            Show('#leaderboard-offline');
+            Hide('#leaderboard'); 
           }
         });
       }, 1000);

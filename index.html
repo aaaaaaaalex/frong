@@ -50,6 +50,9 @@
       text-align: center;
       list-style: decimal;
     }
+    .me_irl {
+      background-color: rgba(100, 255, 255, 0.5);
+    }
 
     .hidden{display:none !important;}
     .unselectable {
@@ -214,10 +217,7 @@
      |______\___|\__,_|\__,_|\___|_|  |_.__/ \___/ \__,_|_|  \__,_|   /_/    \_\_|   |_____|*/
 
     Leaderboard = {
-      endpoint: 'http://wizardhat.'+window.location.hostname+'/leaderboard',
-
-      // who are i? fr doe...
-      uuid: -1,
+      endpoint: 'http://'+window.location.hostname+'/v1/leaderboard',
 
       // (hi, Im frong!) < (hi, frong, I'm leaderboard!)
       hello: function(urName, initComplete) {
@@ -225,8 +225,6 @@
         this._leaderboardReq( 'POST', {'name': urName},
           function(xhr){
             try {
-              var response = JSON.parse(xhr.responseText);
-              this.uuid = response.uuid;
               initComplete(true);
             } catch (e) {
               initComplete(false);
@@ -241,7 +239,7 @@
 
       // (leaderboard, I just scored!) < (oke duely noted, fromgas)
       score: function(points) {
-        this._leaderboardReq( "PATCH", {'points': points, 'uuid': this.uuid},
+        this._leaderboardReq( "PATCH", {'score': points},
           null, // if the request was successful there's nothing left to do!
           function(xhr){
             console.error('Themse other frong petters must have dems airpods in :(');
@@ -348,21 +346,23 @@
     var leaderboardUL = document.getElementById('leaderboard');
     var leaderboardObj = { 'name':"cremit", 'score':0, 'isMe':false };
     
-    // keep 'er synced
     if (online) {
+      // keep 'er synced
       setInterval(function(){
         Leaderboard.refresh(function(leaderboard){
-          if (leaderboard) {
+          if (leaderboard && leaderboard['rankings']) {
             Show('#leaderboard');
             Hide('#leaderboard-offline');
+
+            var rankings = leaderboard['rankings'];
             var i = 0;
-            var listItems = leaderboard.querySelectorAll('#leaderboard li');
-            for(i=0; i<leaderboard.listItems.length; i++){
-              listItems[i].innerHTML = (leaderboard[i])['name']+": "+(leaderboard[i])['score'];
-              if ((leaderboard[i])['isMe']){
-                listItems[i].classList.add('me');
-              } else listItems[i].clasList.remove('me');
+            var listItems = leaderboardUL.querySelectorAll('li');
+            for(i=0; i < listItems.length; i++){
+              listItems[i].innerHTML = (rankings[i])['name']+": "+(rankings[i])['score'];
+              listItems[i].classList.remove('me_irl');
             }
+            if (leaderboard['you'] >= 0 && listItems[ leaderboard['you'] ])
+              listItems[ leaderboard['you'] ].classList.add('me_irl');
           }
           else {
             // swap leaderboard to offline version, *dont* go offline though

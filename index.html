@@ -270,10 +270,10 @@
         xhr.onreadystatechange = function(){
           if (xhr.readyState === XMLHttpRequest.DONE) {
             var status = xhr.status;
-            if (status >= 200 && status <= 400) {
-              if (typeof onsuccess === 'function') onsuccess(xhr);
+            if (status >= 200 && status < 400) {
+              if (typeof onsuccess === 'function') {onsuccess(xhr);}
             }
-            else if (onerror) onerror(xhr);
+            else if (typeof onerror === 'function') {onerror(xhr);}
           }
         }
         xhr.send(JSON.stringify(body));
@@ -308,7 +308,7 @@
       <li>Kermit: 0</li>
       <li>Kermit: 0</li>
     </ul>
-    <h1 id='leaderboard-offline'>Where's everyone gone :c</h1>
+    <h1 id='leaderboard-offline'>I ain't vibin wiff other frongs rn :c</h1>
   </div>
 
   <!---           _____                                 __                 __   
@@ -375,11 +375,12 @@
 
     /* if i pet a fronge in the woods and no one is 
        around to see it, did I really pete fromge? */
+    var increaseScoreTentatively = Throttle(increaseScore, 15);
     frong.addEventListener( 'mousedown', function(e) {
       var randNum = Math.floor(Math.random() * 3);
       hits[randNum].play();
       WiggleOnce(frong);
-      increaseScore();
+      increaseScoreTentatively();
     });
 
 

@@ -270,7 +270,9 @@
         xhr.onreadystatechange = function(){
           if (xhr.readyState === XMLHttpRequest.DONE) {
             var status = xhr.status;
-            if ((status >= 200 && status <= 400) && typeof onsuccess === 'function') onsuccess(xhr);
+            if (status >= 200 && status <= 400) {
+              if (typeof onsuccess === 'function') onsuccess(xhr);
+            }
             else if (onerror) onerror(xhr);
           }
         }
@@ -342,37 +344,6 @@
     var appear = document.getElementById('appear');
     var hits   = document.querySelectorAll('audio[id^="hit"]'); // get all elems with id's beginning with "hit"
 
-    // leaderboard
-    var leaderboardUL = document.getElementById('leaderboard');
-    var leaderboardObj = { 'name':"cremit", 'score':0, 'isMe':false };
-    
-    if (online) {
-      // keep 'er synced
-      setInterval(function(){
-        Leaderboard.refresh(function(leaderboard){
-          if (leaderboard && leaderboard['rankings']) {
-            Show('#leaderboard');
-            Hide('#leaderboard-offline');
-
-            var rankings = leaderboard['rankings'];
-            var i = 0;
-            var listItems = leaderboardUL.querySelectorAll('li');
-            for(i=0; i < listItems.length; i++){
-              listItems[i].innerHTML = (rankings[i])['name']+": "+(rankings[i])['score'];
-              listItems[i].classList.remove('me_irl');
-            }
-            if (leaderboard['you'] >= 0 && listItems[ leaderboard['you'] ])
-              listItems[ leaderboard['you'] ].classList.add('me_irl');
-          }
-          else {
-            // swap leaderboard to offline version, *dont* go offline though
-            Show('#leaderboard-offline');
-            Hide('#leaderboard'); 
-          }
-        });
-      }, 1000);
-    }
-
     // petting points
     var scoreContainerElem = document.getElementById('score');
     var scoreElem = document.getElementById('score-num');
@@ -382,10 +353,7 @@
     var highscore = GameStorage.get('highscore') || 0;
     highscoreElem.innerHTML = highscore;
 
-    function increaseScore() {
-      var points = (Math.floor( Math.random() * 80 ) + 20);
-      score += points;
-      WiggleOnce(scoreContainerElem);
+    function _setScore(score){
       if (score > highscore) {
         highscore = score;
         WiggleOnce(highscoreContainerElem);
@@ -394,17 +362,61 @@
       scoreElem.innerHTML = score;
       highscoreElem.innerHTML = highscore;
       GameStorage.set('highscore', highscore);
+    }
+
+    function increaseScore() {
+      var points = (Math.floor( Math.random() * 80 ) + 20);
+      score += points;
+      WiggleOnce(scoreContainerElem);
+
       if (online) Leaderboard.score(points);
+      _setScore(score)
     }
 
     /* if i pet a fronge in the woods and no one is 
        around to see it, did I really pete fromge? */
-    frong.addEventListener( 'click', function(e) {
+    frong.addEventListener( 'mousedown', function(e) {
       var randNum = Math.floor(Math.random() * 3);
       hits[randNum].play();
       WiggleOnce(frong);
       increaseScore();
     });
+
+
+    // leaderboard
+    var leaderboardUL = document.getElementById('leaderboard');
+    var leaderboardObj = { 'name':"cremit", 'score':0, 'isMe':false };
+    
+    var updateLeaderboard = function(){
+      Leaderboard.refresh(function(leaderboard){
+        if (leaderboard && leaderboard['rankings']) {
+          Show('#leaderboard');
+          Hide('#leaderboard-offline');
+
+          var rankings = leaderboard['rankings'];
+          var i = 0;
+          var listItems = leaderboardUL.querySelectorAll('li');
+          for(i=0; i < listItems.length; i++){
+            listItems[i].innerHTML = (rankings[i])['name']+": "+(rankings[i])['score'];
+            listItems[i].classList.remove('me_irl');
+          }
+          if (leaderboard['you'] >= 0 && listItems[ leaderboard['you'] ]) {
+            listItems[ leaderboard['you'] ].classList.add('me_irl');
+          }
+        }
+        else {
+          // swap leaderboard to offline version, *dont* go offline though
+          Show('#leaderboard-offline');
+          Hide('#leaderboard'); 
+        }
+      });
+    }
+
+    if (online) {
+      updateLeaderboard();
+      // keep 'er synced
+      setInterval(updateLeaderboard, 3000);
+    }
 
     ToggleVisibility('.toggleVisibilityOnLoad');
     appear.play();
